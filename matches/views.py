@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.http import HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views.decorators.cache import never_cache
 
 from decks.models import Deck
 
@@ -227,8 +228,8 @@ def notifications_center(request):
         },
     )
 
-
 @login_required
+@never_cache
 def notifications_feed(request):
     since_id = request.GET.get('since_id')
     base_qs = MatchNotification.objects.filter(recipient=request.user)
@@ -256,11 +257,9 @@ def notifications_feed(request):
     new_items = [serialize(item) for item in incremental_qs.order_by('id')[:20]]
     unread_count = MatchNotification.objects.filter(recipient=request.user, is_read=False).count()
     last_id = base_qs.order_by('-id').values_list('id', flat=True).first() or 0
-    return JsonResponse(
-        {
-            'notifications': payload,
-            'new_notifications': new_items,
-            'unread_count': unread_count,
-            'last_id': last_id,
-        }
-    )
+    return JsonResponse({
+        'notifications': payload,
+        'new_notifications': new_items,
+        'unread_count': unread_count,
+        'last_id': last_id,
+    })
