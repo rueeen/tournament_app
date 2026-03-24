@@ -9,13 +9,13 @@
     </a>
   </div>
   <div class="col-6 col-md-3">
-    <a class="card-stat card-stat--link" href="{% url 'deck_list' %}">
+    <a class="card-stat card-stat--link" href="#top-mazos">
       <span>Mazos</span>
       <strong>{{ global_stats.total_decks }}</strong>
     </a>
   </div>
   <div class="col-6 col-md-3">
-    <a class="card-stat card-stat--link" href="{% url 'match_list' %}">
+    <a class="card-stat card-stat--link" href="#resumen-partidas">
       <span>Partidas</span>
       <strong>{{ global_stats.total_matches }}</strong>
     </a>
@@ -33,12 +33,6 @@
     <div>
       <span class="text-secondary small d-block">Resumen de partidas</span>
       <small class="text-secondary">Totales: {{ global_stats.total_matches }} · Finalizadas: {{ global_stats.finalized_matches }}</small>
-    </div>
-    <div class="d-flex flex-wrap gap-2 align-items-center">
-      <span class="text-secondary small me-1">Accesos rápidos:</span>
-      <a class="btn btn-outline-light btn-sm ranking-shortcut" href="{% url 'players_list' %}">Jugadores</a>
-      <a class="btn btn-outline-light btn-sm ranking-shortcut" href="{% url 'deck_list' %}">Mazos</a>
-      <a class="btn btn-outline-light btn-sm ranking-shortcut" href="{% url 'match_list' %}">Partidas</a>
     </div>
   </div>
 </div>
