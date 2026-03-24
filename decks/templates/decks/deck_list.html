@@ -5,7 +5,7 @@
 {% for deck in decks %}
 <div class="col-12 col-md-6 col-lg-4">
   <div class="card bg-black border-secondary h-100 deck-card">
-    {% if deck.cover_image %}<img src="{{ deck.cover_image.url }}" class="card-img-top deck-cover" alt="{{ deck.name }}">{% endif %}
+    {% if deck.cover_image %}<img src="{{ deck.cover_image.url }}" class="card-img-top deck-cover" alt="{{ deck.name }}">{% elif deck.cover_image_url %}<img src="{{ deck.cover_image_url }}" class="card-img-top deck-cover" alt="{{ deck.name }}">{% endif %}
     <div class="card-body">
       <h2 class="h6 mb-2">{{ deck.name }}</h2>
       <p class="small text-secondary mb-1">{% for c in deck.colors.all %}{{ c.get_name_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
