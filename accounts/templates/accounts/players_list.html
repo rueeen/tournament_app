@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4">Jugadores</h1>
+  <a class="btn btn-outline-info btn-sm" href="{% url 'profile' %}">Mi perfil</a>
+</div>
+
+<div class="row g-3">
+  {% for player in players %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <div class="card bg-black border-secondary h-100 p-3 player-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          {% if player.profile.avatar %}
+            <img class="avatar avatar-sm" src="{{ player.profile.avatar.url }}" alt="avatar de {{ player.username }}">
+          {% else %}
+            <div class="avatar-placeholder avatar-sm">{{ player.username|first|upper }}</div>
+          {% endif %}
+          <div>
+            <h2 class="h6 mb-0">{{ player.username }}</h2>
+            <small class="text-secondary">Win rate: {{ player.profile.win_rate }}%</small>
+          </div>
+        </div>
+        <p class="small mb-1">Victorias/Derrotas: {{ player.profile.wins }}/{{ player.profile.losses }}</p>
+        <p class="small mb-3">Mazos registrados: {{ player.decks_count }}</p>
+        <a href="{% url 'player_profile' player.id %}" class="btn btn-sm btn-outline-light">Ver perfil y mazos</a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="text-secondary">No hay otros jugadores registrados por el momento.</p>
+  {% endfor %}
+</div>
+{% endblock %}
