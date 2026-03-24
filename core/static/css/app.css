@@ -284,12 +284,17 @@ a:hover { color: #c0dcff; }
 .mana-symbol {
   width: 1.1rem;
   height: 1.1rem;
+  max-width: 1.1rem;
+  max-height: 1.1rem;
+  flex: 0 0 1.1rem;
+  display: inline-block;
   vertical-align: middle;
 }
 
 .deck-color-icons {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.3rem;
   min-height: 1.2rem;
 }

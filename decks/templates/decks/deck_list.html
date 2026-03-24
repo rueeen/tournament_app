@@ -11,18 +11,18 @@
       <div class="deck-color-icons mb-2" aria-label="Colores del mazo">
         {% for c in deck.colors.all %}
           {% if c.name == 'white' %}
-            <img src="https://svgs.scryfall.io/card-symbols/W.svg" alt="Planicie" title="Planicie" class="mana-symbol">
+            <img src="https://svgs.scryfall.io/card-symbols/W.svg" alt="Planicie" title="Planicie" class="mana-symbol" width="18" height="18">
           {% elif c.name == 'blue' %}
-            <img src="https://svgs.scryfall.io/card-symbols/U.svg" alt="Isla" title="Isla" class="mana-symbol">
+            <img src="https://svgs.scryfall.io/card-symbols/U.svg" alt="Isla" title="Isla" class="mana-symbol" width="18" height="18">
           {% elif c.name == 'black' %}
-            <img src="https://svgs.scryfall.io/card-symbols/B.svg" alt="Pantano" title="Pantano" class="mana-symbol">
+            <img src="https://svgs.scryfall.io/card-symbols/B.svg" alt="Pantano" title="Pantano" class="mana-symbol" width="18" height="18">
           {% elif c.name == 'red' %}
-            <img src="https://svgs.scryfall.io/card-symbols/R.svg" alt="Montaña" title="Montaña" class="mana-symbol">
+            <img src="https://svgs.scryfall.io/card-symbols/R.svg" alt="Montaña" title="Montaña" class="mana-symbol" width="18" height="18">
           {% elif c.name == 'green' %}
-            <img src="https://svgs.scryfall.io/card-symbols/G.svg" alt="Bosque" title="Bosque" class="mana-symbol">
+            <img src="https://svgs.scryfall.io/card-symbols/G.svg" alt="Bosque" title="Bosque" class="mana-symbol" width="18" height="18">
           {% endif %}
         {% empty %}
-          <img src="https://svgs.scryfall.io/card-symbols/C.svg" alt="Incoloro" title="Incoloro" class="mana-symbol">
+          <img src="https://svgs.scryfall.io/card-symbols/C.svg" alt="Incoloro" title="Incoloro" class="mana-symbol" width="18" height="18">
         {% endfor %}
       </div>
       <p class="small text-secondary mb-1">{% for c in deck.colors.all %}{{ c.get_name_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
