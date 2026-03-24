@@ -49,9 +49,18 @@ textarea:focus {
   box-shadow: 0 0 0 .2rem rgba(94,162,255,.2) !important;
 }
 
-.form-label,
-.text-secondary {
-  color: var(--muted) !important;
+.form-label { color: var(--text) !important; }
+.form-check-label { color: var(--text) !important; }
+.text-secondary { color: var(--muted) !important; }
+
+.form-check-input {
+  background-color: rgba(9, 16, 32, 0.8);
+  border-color: var(--border);
+}
+
+.form-check-input:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 .btn-primary {
