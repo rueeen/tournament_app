@@ -146,12 +146,30 @@ class MatchNotification(models.Model):
     actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='triggered_match_notifications')
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='notifications')
     notification_type = models.CharField(max_length=32, choices=Type.choices)
-    message = models.CharField(max_length=220)
+    title = models.CharField(max_length=120, default='Notificación')
+    message = models.TextField()
+    action_url = models.CharField(max_length=255, blank=True)
+    action_label = models.CharField(max_length=80, blank=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['recipient', 'is_read', '-created_at']),
+            models.Index(fields=['recipient', '-created_at']),
+            models.Index(fields=['created_at']),
+        ]
 
     def __str__(self):
         return f'Notificación para {self.recipient.username}: {self.message}'
+
+    def mark_as_read(self, commit=True):
+        if self.is_read and self.read_at:
+            return
+        self.is_read = True
+        self.read_at = timezone.now()
+        if commit:
+            self.save(update_fields=['is_read', 'read_at'])

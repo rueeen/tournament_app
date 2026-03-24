@@ -45,6 +45,8 @@ window.addEventListener('load', () => {
   const feedUrl = document.body.dataset.notificationsFeedUrl;
   const notificationItems = document.getElementById('notifications-items');
   const notificationsBadge = document.getElementById('notifications-badge');
+  let lastNotificationId = 0;
+  let pollTimer = null;
 
   const updateNotificationBadge = (count) => {
     if (!notificationsBadge) return;
@@ -63,8 +65,9 @@ window.addEventListener('load', () => {
       .map((item) => {
         const unreadClass = item.is_read ? '' : 'notification-item--unread';
         return `
-          <a class="dropdown-item notification-item ${unreadClass}" href="/matches/${item.match_id}/">
+          <a class="dropdown-item notification-item ${unreadClass}" href="${item.open_url}" data-notification-id="${item.id}">
             <small class="d-block text-secondary">${item.created_at}</small>
+            <span class="d-block fw-semibold">${item.title || 'Notificación'}</span>
             <span>${item.message}</span>
           </a>
         `;
@@ -73,38 +76,56 @@ window.addEventListener('load', () => {
     notificationItems.innerHTML = html;
   };
 
-  const pollNotifications = async () => {
+  const showToastIfNeeded = (item) => {
+    const notificationId = String(item.id);
+    const storageKey = `notification-seen-${notificationId}`;
+    if (item.is_read || seenNotificationIds.has(notificationId) || localStorage.getItem(storageKey)) return;
+    if (notyf) {
+      notyf.open({ type: 'info', message: `${item.title || 'Notificación'}: ${item.message}` });
+    }
+    localStorage.setItem(storageKey, '1');
+    seenNotificationIds.add(notificationId);
+  };
+
+  const pollNotifications = async (fullRefresh = false) => {
     if (!feedUrl || !notificationItems) return;
     try {
-      const response = await fetch(feedUrl, {
+      const url = new URL(feedUrl, window.location.origin);
+      if (lastNotificationId > 0 && !fullRefresh) {
+        url.searchParams.set('since_id', String(lastNotificationId));
+      }
+      const response = await fetch(url.toString(), {
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
       });
       if (!response.ok) return;
       const payload = await response.json();
       const items = payload.notifications || [];
+      const newItems = payload.new_notifications || [];
       updateNotificationBadge(payload.unread_count || 0);
-      renderNotifications(items);
-
-      items.forEach((item) => {
-        const notificationId = String(item.id);
-        const storageKey = `notification-seen-${notificationId}`;
-        if (item.is_read || seenNotificationIds.has(notificationId) || localStorage.getItem(storageKey)) return;
-        if (notyf) {
-          notyf.open({ type: 'info', message: item.message });
-        }
-        localStorage.setItem(storageKey, '1');
-        seenNotificationIds.add(notificationId);
-      });
+      if (fullRefresh || newItems.length > 0) {
+        renderNotifications(items);
+      }
+      newItems.forEach(showToastIfNeeded);
+      if (payload.last_id) lastNotificationId = payload.last_id;
     } catch (error) {
       console.debug('No se pudo actualizar el feed de notificaciones.', error);
     }
   };
 
+  const startPolling = () => {
+    const intervalMs = document.hidden ? 45000 : 15000;
+    if (pollTimer) {
+      clearInterval(pollTimer);
+    }
+    pollTimer = setInterval(() => pollNotifications(), intervalMs);
+  };
+
   if (feedUrl && notificationItems) {
-    pollNotifications();
-    setInterval(pollNotifications, 15000);
+    pollNotifications(true);
+    startPolling();
     document.addEventListener('visibilitychange', () => {
+      startPolling();
       if (!document.hidden) pollNotifications();
     });
   }
