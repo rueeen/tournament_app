@@ -21,6 +21,7 @@ class Deck(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='decks')
     name = models.CharField(max_length=120)
     cover_image = models.ImageField(upload_to='deck_covers/', blank=True, null=True)
+    cover_image_url = models.URLField(blank=True)
     colors = models.ManyToManyField(DeckColor, related_name='decks')
     wins = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])
     losses = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0)])

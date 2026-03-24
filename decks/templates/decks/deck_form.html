@@ -3,9 +3,112 @@
 {% block content %}
 <h1 class="h4 mb-3">{{ title }}</h1>
 <div class="card bg-black border-secondary p-3">
-<form method="post" enctype="multipart/form-data">{% csrf_token %}
-  {{ form|crispy }}
-  <button class="btn btn-success">Guardar</button>
-</form>
+  <div class="mb-3">
+    <label for="commander-search" class="form-label">Buscar comandante en Scryfall</label>
+    <div class="input-group">
+      <input id="commander-search" type="text" class="form-control" placeholder="Ej: Atraxa">
+      <button id="commander-search-btn" type="button" class="btn btn-outline-info">Buscar</button>
+    </div>
+    <small class="text-secondary">Selecciona una carta para autocompletar nombre, colores y sugerencia de tierras.</small>
+  </div>
+
+  <div id="commander-search-results" class="list-group mb-3"></div>
+
+  <div id="commander-preview" class="mb-3 d-none">
+    <div class="d-flex gap-3 align-items-start">
+      <img id="commander-preview-image" src="" alt="Comandante" style="width:140px; border-radius:0.5rem;">
+      <div>
+        <h2 id="commander-preview-name" class="h6 mb-2"></h2>
+        <p id="commander-land-suggestion" class="mb-0 small text-secondary"></p>
+      </div>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data">{% csrf_token %}
+    {{ form|crispy }}
+    <button class="btn btn-success">Guardar</button>
+  </form>
 </div>
+
+<script>
+(function () {
+  const searchInput = document.getElementById('commander-search');
+  const searchButton = document.getElementById('commander-search-btn');
+  const resultsContainer = document.getElementById('commander-search-results');
+  const previewContainer = document.getElementById('commander-preview');
+  const previewImage = document.getElementById('commander-preview-image');
+  const previewName = document.getElementById('commander-preview-name');
+  const previewLands = document.getElementById('commander-land-suggestion');
+
+  const deckNameField = document.getElementById('id_name');
+  const coverImageUrlField = document.getElementById('id_cover_image_url');
+
+  function renderResults(results) {
+    resultsContainer.innerHTML = '';
+
+    if (!results.length) {
+      const empty = document.createElement('div');
+      empty.className = 'text-secondary small';
+      empty.textContent = 'No encontramos comandantes con ese nombre.';
+      resultsContainer.appendChild(empty);
+      return;
+    }
+
+    results.forEach((result) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'list-group-item list-group-item-action bg-dark text-light border-secondary';
+      button.innerHTML = `<strong>${result.name}</strong><br><span class="small">Identidad: ${result.color_identity.join(', ') || 'Incolora'}</span>`;
+      button.addEventListener('click', () => applyCommander(result));
+      resultsContainer.appendChild(button);
+    });
+  }
+
+  function applyCommander(result) {
+    if (deckNameField) {
+      deckNameField.value = result.name;
+    }
+    if (coverImageUrlField) {
+      coverImageUrlField.value = result.image_url || '';
+    }
+
+    document.querySelectorAll('input[name="colors"]').forEach((checkbox) => {
+      checkbox.checked = result.color_ids.includes(Number(checkbox.value));
+    });
+
+    if (result.image_url) {
+      previewImage.src = result.image_url;
+      previewImage.classList.remove('d-none');
+    } else {
+      previewImage.classList.add('d-none');
+    }
+
+    previewName.textContent = result.name;
+    previewLands.textContent = `Tierras base sugeridas (36): ${result.land_suggestion.map((item) => `${item.count} ${item.land}`).join(', ')}`;
+    previewContainer.classList.remove('d-none');
+  }
+
+  async function runSearch() {
+    const query = searchInput.value.trim();
+    if (query.length < 2) {
+      resultsContainer.innerHTML = '<div class="text-secondary small">Escribe al menos 2 caracteres para buscar.</div>';
+      return;
+    }
+
+    resultsContainer.innerHTML = '<div class="text-secondary small">Buscando...</div>';
+
+    const response = await fetch(`{% url 'commander_search' %}?q=${encodeURIComponent(query)}`);
+    const payload = await response.json();
+    renderResults(payload.results || []);
+  }
+
+  searchButton.addEventListener('click', runSearch);
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      runSearch();
+    }
+  });
+})();
+</script>
 {% endblock %}
