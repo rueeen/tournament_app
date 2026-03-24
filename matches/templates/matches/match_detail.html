@@ -5,9 +5,24 @@
 <div class="card bg-black border-secondary p-3 mb-3"><h2 class="h6">Jugadores</h2>
 <ul>{% for mp in match.players.all %}<li>{{ mp.user.username }} — {{ mp.deck.name }}</li>{% endfor %}</ul></div>
 <div class="card bg-black border-secondary p-3 mb-3"><h2 class="h6">Invitaciones</h2>{% for i in match.invitations.all %}<p>{{ i.invited_user.username }}: {{ i.get_status_display }}</p>{% empty %}<p class="text-secondary">Sin invitaciones.</p>{% endfor %}</div>
-{% if active_proposal %}
-<div class="card bg-black border-warning p-3 mb-3"><h2 class="h6">Resultado propuesto</h2><p>Ganador: <strong>{{ active_proposal.winner.username }}</strong></p><p>Propuesto por: {{ active_proposal.proposed_by.username }}</p><a class="btn btn-sm btn-outline-light" href="{% url 'decide_result' active_proposal.id %}">Aceptar/Rechazar</a></div>
-{% else %}
+{% if match.status == match.Status.FINALIZED and latest_proposal %}
+<div class="card bg-black border-success p-3 mb-3">
+  <h2 class="h6">Resultado final</h2>
+  <p>Ganador confirmado: <strong>{{ latest_proposal.winner.username }}</strong></p>
+  <p class="mb-0">Este resultado ya fue aceptado por todos los jugadores.</p>
+</div>
+{% elif active_proposal %}
+<div class="card bg-black border-warning p-3 mb-3">
+  <h2 class="h6">Resultado propuesto</h2>
+  <p>Ganador: <strong>{{ active_proposal.winner.username }}</strong></p>
+  <p>Propuesto por: {{ active_proposal.proposed_by.username }}</p>
+  {% if my_acceptance %}
+  <p class="mb-0 text-secondary">Ya registraste tu decisión: {{ my_acceptance.get_decision_display }}.</p>
+  {% else %}
+  <a class="btn btn-sm btn-outline-light" href="{% url 'decide_result' active_proposal.id %}">Aceptar/Rechazar</a>
+  {% endif %}
+</div>
+{% elif match.status != match.Status.FINALIZED %}
 <a class="btn btn-primary" href="{% url 'propose_result' match.id %}">Proponer resultado</a>
 {% endif %}
 {% endblock %}

@@ -80,6 +80,7 @@ def match_detail(request, pk):
         return redirect('match_list')
 
     active_proposal = match.result_proposals.filter(is_active=True).first()
+    latest_proposal = match.result_proposals.first()
     my_acceptance = None
     if active_proposal:
         my_acceptance = active_proposal.acceptances.filter(user=request.user).first()
@@ -87,7 +88,7 @@ def match_detail(request, pk):
     return render(
         request,
         'matches/match_detail.html',
-        {'match': match, 'active_proposal': active_proposal, 'my_acceptance': my_acceptance},
+        {'match': match, 'active_proposal': active_proposal, 'latest_proposal': latest_proposal, 'my_acceptance': my_acceptance},
     )
 
 
@@ -97,6 +98,9 @@ def propose_result(request, pk):
     match = get_object_or_404(Match, pk=pk)
     if not match.players.filter(user=request.user).exists():
         messages.error(request, 'Solo participantes pueden proponer resultados.')
+        return redirect('match_detail', pk=pk)
+    if match.status == Match.Status.FINALIZED:
+        messages.info(request, 'La partida ya está finalizada y no admite nuevos resultados.')
         return redirect('match_detail', pk=pk)
 
     if request.method == 'POST':
@@ -133,6 +137,9 @@ def decide_result(request, proposal_id):
     if not proposal.match.players.filter(user=request.user).exists():
         messages.error(request, 'No puedes votar este resultado.')
         return redirect('match_list')
+    if proposal.match.status == Match.Status.FINALIZED:
+        messages.info(request, 'La partida ya está finalizada. No se pueden registrar más decisiones.')
+        return redirect('match_detail', pk=proposal.match.pk)
 
     if request.method == 'POST':
         form = ResultDecisionForm(request.POST)
