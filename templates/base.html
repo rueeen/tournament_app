@@ -8,7 +8,7 @@
   <link href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css" rel="stylesheet">
   <link href="/static/css/app.css" rel="stylesheet">
 </head>
-<body class="app-body">
+<body class="app-body" data-notifications-feed-url="{% url 'notifications_feed' %}">
 <nav class="navbar navbar-expand-lg navbar-dark bg-black border-bottom border-secondary sticky-top">
   <div class="container-fluid">
     <a class="navbar-brand fw-bold" href="/">⚔️ MTG Arena Hub</a>
@@ -27,23 +27,23 @@
       <div class="dropdown me-3 notifications-wrapper">
         <button class="btn btn-outline-light btn-sm position-relative notifications-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
           🔔
-          {% if unread_notifications_count %}
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notifications_count }}</span>
-          {% endif %}
+          <span id="notifications-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if not unread_notifications_count %}d-none{% endif %}">{{ unread_notifications_count }}</span>
         </button>
-        <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2 notifications-menu">
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2 notifications-menu" id="notifications-menu">
           <div class="d-flex justify-content-between align-items-center mb-2">
             <strong>Notificaciones</strong>
             <a href="{% url 'mark_notifications_read' %}?next={{ request.path }}" class="small">Marcar leídas</a>
           </div>
+          <div id="notifications-items">
           {% for notification in header_notifications %}
             <a class="dropdown-item notification-item {% if not notification.is_read %}notification-item--unread{% endif %}" href="{% url 'match_detail' notification.match.id %}">
               <small class="d-block text-secondary">{{ notification.created_at|date:"d/m H:i" }}</small>
               <span>{{ notification.message }}</span>
             </a>
           {% empty %}
-            <p class="text-secondary small mb-0">No hay notificaciones todavía.</p>
+            <p class="text-secondary small mb-0" id="notifications-empty">No hay notificaciones todavía.</p>
           {% endfor %}
+          </div>
         </div>
       </div>
       <form method="post" action="{% url 'logout' %}" class="d-inline">

@@ -2,27 +2,27 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h4">Mi perfil</h1></div>
-<div class="row g-3">
+<div class="row g-3 profile-layout">
   <div class="col-12 col-md-4">
-    <div class="card bg-black border-secondary p-3 text-center">
+    <div class="card bg-black border-secondary p-3 text-center profile-card-main">
       {% if profile.avatar %}<img class="avatar mx-auto mb-2" src="{{ profile.avatar.url }}" alt="avatar">{% else %}<div class="avatar-placeholder mx-auto mb-2">{{ user.username|first|upper }}</div>{% endif %}
-      <h2 class="h5">{{ user.username }}</h2>
-      <p class="text-secondary mb-1">{{ user.email }}</p>
+      <h2 class="h5 mb-1">{{ user.username }}</h2>
+      <p class="text-secondary mb-1 profile-email">{{ user.email|default:'Sin correo registrado' }}</p>
       <p class="mb-0">Win rate: {{ profile.win_rate }}%</p>
     </div>
   </div>
   <div class="col-12 col-md-8">
-    <div class="card bg-black border-secondary p-3">
+    <div class="card bg-black border-secondary p-3 profile-card-stats">
       <h3 class="h6">Estadísticas</h3>
-      <div class="row text-center">
-        <div class="col"><strong>{{ profile.wins }}</strong><br>Victorias</div>
-        <div class="col"><strong>{{ profile.losses }}</strong><br>Derrotas</div>
-        <div class="col"><strong>{{ profile.total_matches }}</strong><br>Partidas</div>
+      <div class="row text-center g-2 profile-stats-grid">
+        <div class="col-4"><div class="profile-stat"><strong>{{ profile.wins }}</strong><br>Victorias</div></div>
+        <div class="col-4"><div class="profile-stat"><strong>{{ profile.losses }}</strong><br>Derrotas</div></div>
+        <div class="col-4"><div class="profile-stat"><strong>{{ profile.total_matches }}</strong><br>Partidas</div></div>
       </div>
       <hr>
-      <form method="post" enctype="multipart/form-data">{% csrf_token %}
+      <form method="post" enctype="multipart/form-data" class="profile-form">{% csrf_token %}
         {{ form|crispy }}
-        <button class="btn btn-primary">Guardar perfil</button>
+        <button class="btn btn-primary profile-save-btn">Guardar perfil</button>
       </form>
     </div>
   </div>

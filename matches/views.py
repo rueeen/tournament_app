@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from decks.models import Deck
 
 from .forms import MatchCreateForm, MatchResultProposalForm, ResultDecisionForm
 from .models import Match, MatchInvitation, MatchNotification, MatchPlayer, MatchResultAcceptance, MatchResultProposal
-from .notifications import notify_users
 
 
 @login_required
@@ -40,14 +40,6 @@ def match_create(request):
 
             for invited in participants:
                 MatchInvitation.objects.create(match=match, invited_user=invited, invited_by=request.user)
-
-            notify_users(
-                recipients=participants,
-                actor=request.user,
-                match=match,
-                notification_type=MatchNotification.Type.MATCH_CREATED,
-                message=f'{request.user.username} te invitó a la partida #{match.id}.',
-            )
             messages.success(request, 'Partida creada. Se enviaron invitaciones.')
             return redirect('match_detail', pk=match.pk)
     else:
@@ -72,24 +64,10 @@ def invitation_respond(request, pk, decision):
         if invitation.match.players.count() >= 2:
             invitation.match.status = Match.Status.IN_PROGRESS
             invitation.match.save(update_fields=['status', 'updated_at'])
-        notify_users(
-            recipients=[invitation.invited_by],
-            actor=request.user,
-            match=invitation.match,
-            notification_type=MatchNotification.Type.INVITATION_ACCEPTED,
-            message=f'{request.user.username} aceptó la invitación de la partida #{invitation.match.id}.',
-        )
         messages.success(request, 'Invitación aceptada.')
     else:
         invitation.status = MatchInvitation.Status.REJECTED
         invitation.save(update_fields=['status'])
-        notify_users(
-            recipients=[invitation.invited_by],
-            actor=request.user,
-            match=invitation.match,
-            notification_type=MatchNotification.Type.INVITATION_REJECTED,
-            message=f'{request.user.username} rechazó la invitación de la partida #{invitation.match.id}.',
-        )
         messages.warning(request, 'Invitación rechazada.')
     return redirect('invitation_list')
 
@@ -143,23 +121,7 @@ def propose_result(request, pk):
 
             match.status = Match.Status.CLOSED_PENDING
             match.save(update_fields=['status', 'updated_at'])
-            is_finalized = match.finalize_if_all_accepted()
-            participants = [player.user for player in match.players.select_related('user')]
-            notify_users(
-                recipients=participants,
-                actor=request.user,
-                match=match,
-                notification_type=MatchNotification.Type.RESULT_PROPOSED,
-                message=f'{request.user.username} propuso un resultado en la partida #{match.id}.',
-            )
-            if is_finalized:
-                notify_users(
-                    recipients=participants,
-                    actor=request.user,
-                    match=match,
-                    notification_type=MatchNotification.Type.MATCH_FINALIZED,
-                    message=f'La partida #{match.id} quedó finalizada.',
-                )
+            match.finalize_if_all_accepted()
             messages.success(request, 'Resultado propuesto. Pendiente de confirmaciones.')
             return redirect('match_detail', pk=pk)
     else:
@@ -194,35 +156,11 @@ def decide_result(request, proposal_id):
             if acceptance.decision == MatchResultAcceptance.Decision.REJECTED:
                 proposal.match.status = Match.Status.DISPUTED
                 proposal.match.save(update_fields=['status', 'updated_at'])
-                participants = [player.user for player in proposal.match.players.select_related('user')]
-                notify_users(
-                    recipients=participants,
-                    actor=request.user,
-                    match=proposal.match,
-                    notification_type=MatchNotification.Type.RESULT_REJECTED,
-                    message=f'{request.user.username} rechazó un resultado en la partida #{proposal.match.id}.',
-                )
                 messages.error(request, 'Resultado rechazado. La partida quedó en disputa.')
             else:
                 proposal.match.status = Match.Status.CLOSED_PENDING
                 proposal.match.save(update_fields=['status', 'updated_at'])
-                participants = [player.user for player in proposal.match.players.select_related('user')]
-                is_finalized = proposal.match.finalize_if_all_accepted()
-                notify_users(
-                    recipients=participants,
-                    actor=request.user,
-                    match=proposal.match,
-                    notification_type=MatchNotification.Type.RESULT_ACCEPTED,
-                    message=f'{request.user.username} aceptó el resultado de la partida #{proposal.match.id}.',
-                )
-                if is_finalized:
-                    notify_users(
-                        recipients=participants,
-                        actor=request.user,
-                        match=proposal.match,
-                        notification_type=MatchNotification.Type.MATCH_FINALIZED,
-                        message=f'La partida #{proposal.match.id} quedó finalizada.',
-                    )
+                proposal.match.finalize_if_all_accepted()
                 messages.success(request, 'Resultado aceptado.')
 
             return redirect('match_detail', pk=proposal.match.pk)
@@ -238,3 +176,24 @@ def mark_notifications_read(request):
     MatchNotification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
     next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'dashboard'
     return redirect(next_url)
+
+
+@login_required
+def notifications_feed(request):
+    notifications = list(
+        MatchNotification.objects.filter(recipient=request.user)
+        .select_related('match')
+        .order_by('-created_at')[:7]
+    )
+    payload = [
+        {
+            'id': item.id,
+            'message': item.message,
+            'match_id': item.match_id,
+            'is_read': item.is_read,
+            'created_at': item.created_at.strftime('%d/%m %H:%M'),
+        }
+        for item in notifications
+    ]
+    unread_count = MatchNotification.objects.filter(recipient=request.user, is_read=False).count()
+    return JsonResponse({'notifications': payload, 'unread_count': unread_count})

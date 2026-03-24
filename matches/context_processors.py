@@ -10,7 +10,7 @@ def notifications(request):
         .select_related('match')
         .order_by('-created_at')[:7]
     )
-    unread_notifications_count = sum(1 for notification in header_notifications if not notification.is_read)
+    unread_notifications_count = MatchNotification.objects.filter(recipient=request.user, is_read=False).count()
     return {
         'header_notifications': header_notifications,
         'unread_notifications_count': unread_notifications_count,
