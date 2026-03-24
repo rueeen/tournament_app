@@ -51,4 +51,39 @@
     </div>
   </div>
 </div>
+
+<div class="row g-3 mt-1">
+  <div class="col-12">
+    <div class="card bg-black border-secondary p-3">
+      <h3 class="h6 mb-3">Comentarios entre jugadores</h3>
+      <form method="post" class="mb-3">
+        {% csrf_token %}
+        {{ comment_form.message }}
+        {% if comment_form.message.errors %}
+          <div class="text-danger small mt-1">{{ comment_form.message.errors|join:", " }}</div>
+        {% endif %}
+        <button type="submit" class="btn btn-primary btn-sm mt-2">Publicar comentario</button>
+      </form>
+
+      <div class="profile-comments">
+        {% for comment in comments %}
+          <article class="profile-comment">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              {% if comment.author.profile.avatar %}
+                <img class="avatar avatar-sm" src="{{ comment.author.profile.avatar.url }}" alt="avatar de {{ comment.author.username }}">
+              {% else %}
+                <div class="avatar-placeholder avatar-sm">{{ comment.author.username|first|upper }}</div>
+              {% endif %}
+              <strong>{{ comment.author.username }}</strong>
+              <small class="text-secondary">{{ comment.created_at|date:"d/m/Y H:i" }}</small>
+            </div>
+            <p class="mb-0">{{ comment.message }}</p>
+          </article>
+        {% empty %}
+          <p class="text-secondary mb-0">Todavía no hay comentarios para este perfil.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
