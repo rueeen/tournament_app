@@ -35,7 +35,9 @@
   <a class="btn btn-sm btn-outline-light" href="{% url 'decide_result' active_proposal.id %}">Aceptar/Rechazar</a>
   {% endif %}
 </div>
-{% elif match.status != match.Status.FINALIZED %}
+{% elif can_propose_result %}
 <a class="btn btn-primary" href="{% url 'propose_result' match.id %}">Proponer resultado</a>
+{% elif match.status != match.Status.FINALIZED and not all_invitations_accepted %}
+<p class="text-secondary mb-0">El resultado se podrá proponer cuando todas las invitaciones estén aceptadas.</p>
 {% endif %}
 {% endblock %}
