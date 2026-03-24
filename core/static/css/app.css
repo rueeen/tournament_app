@@ -89,7 +89,19 @@ textarea:focus {
   border: 0;
 }
 
-.deck-cover { max-height: 180px; object-fit: cover; border-radius: 10px; }
+.deck-card {
+  overflow: hidden;
+}
+
+.deck-cover {
+  aspect-ratio: 63 / 88;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+  background: #050a16;
+  padding: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
 .avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
 .avatar-placeholder { width:96px; height:96px; border-radius:50%; background:#1a2950; display:flex; align-items:center; justify-content:center; font-size:2rem; border: 2px solid var(--border); }
 .list-group-item,
