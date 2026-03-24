@@ -8,6 +8,17 @@ from decks import services
 
 
 class SearchCommandersTests(SimpleTestCase):
+    def test_search_commanders_includes_planeswalker_commander_clause(self):
+        with patch('decks.services._fetch_cards_paginated') as mock_fetch_cards:
+            mock_fetch_cards.return_value = []
+
+            services.search_commanders('tevesh')
+
+        query_sent = mock_fetch_cards.call_args.args[0]
+        self.assertIn('type:legendary', query_sent)
+        self.assertIn('type:creature', query_sent)
+        self.assertIn('type:planeswalker oracle:"can be your commander"', query_sent)
+
     def test_fallback_named_query_returns_commander_legal_cards(self):
         with patch('decks.services._fetch_cards_paginated') as mock_fetch_cards, patch(
             'decks.services._fetch_named_candidates'

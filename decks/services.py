@@ -46,7 +46,9 @@ def search_commanders(term, limit=8):
     if not clean_term:
         return []
 
-    primary_query = f'{clean_term} type:legendary type:creature game:paper'
+    primary_query = (
+        f'{clean_term} type:legendary (type:creature or (type:planeswalker oracle:"can be your commander")) game:paper'
+    )
     cards = _fetch_cards_paginated(primary_query, limit=limit)
 
     if not cards:
