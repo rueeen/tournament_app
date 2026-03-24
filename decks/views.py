@@ -17,7 +17,7 @@ def deck_list(request):
 @login_required
 def deck_create(request):
     if request.method == 'POST':
-        form = DeckForm(request.POST, request.FILES)
+        form = DeckForm(request.POST)
         if form.is_valid():
             deck = form.save(commit=False)
             deck.owner = request.user
@@ -34,7 +34,7 @@ def deck_create(request):
 def deck_update(request, pk):
     deck = get_object_or_404(Deck, pk=pk, owner=request.user)
     if request.method == 'POST':
-        form = DeckForm(request.POST, request.FILES, instance=deck)
+        form = DeckForm(request.POST, instance=deck)
         if form.is_valid():
             form.save()
             messages.success(request, 'Mazo actualizado correctamente.')

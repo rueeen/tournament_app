@@ -12,7 +12,7 @@ class DeckForm(forms.ModelForm):
 
     class Meta:
         model = Deck
-        fields = ('name', 'cover_image', 'cover_image_url', 'colors')
+        fields = ('name', 'cover_image_url', 'colors')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
