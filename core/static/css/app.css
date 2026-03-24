@@ -326,3 +326,21 @@ a:hover { color: #c0dcff; }
   background: rgba(18, 31, 56, 0.78);
   border: 1px solid var(--border);
 }
+
+.ranking-list {
+  padding-left: 1.25rem;
+}
+
+.ranking-list__item {
+  margin-bottom: 0.45rem;
+}
+
+.ranking-list__link {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.ranking-list__link:hover,
+.ranking-list__link:focus {
+  text-decoration: underline;
+}
