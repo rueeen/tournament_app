@@ -1,13 +1,16 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import JsonResponse
+from django.core.paginator import Paginator
+from django.http import HttpResponseNotAllowed, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from decks.models import Deck
 
 from .forms import MatchCreateForm, MatchResultProposalForm, ResultDecisionForm
 from .models import Match, MatchInvitation, MatchNotification, MatchPlayer, MatchResultAcceptance, MatchResultProposal
+from .notifications import NotificationService
 
 
 @login_required
@@ -173,27 +176,91 @@ def decide_result(request, proposal_id):
 @login_required
 @transaction.atomic
 def mark_notifications_read(request):
-    MatchNotification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
-    next_url = request.GET.get('next') or request.META.get('HTTP_REFERER') or 'dashboard'
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    NotificationService.mark_all_read_for_user(request.user)
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or reverse('dashboard')
     return redirect(next_url)
 
 
 @login_required
-def notifications_feed(request):
-    notifications = list(
-        MatchNotification.objects.filter(recipient=request.user)
-        .select_related('match')
-        .order_by('-created_at')[:7]
-    )
-    payload = [
+def mark_notification_read(request, pk):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    notification = get_object_or_404(MatchNotification, pk=pk, recipient=request.user)
+    NotificationService.mark_notification_read(notification)
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True, 'notification_id': notification.id})
+    return redirect(request.POST.get('next') or reverse('notifications_center'))
+
+
+@login_required
+def open_notification(request, pk):
+    notification = get_object_or_404(MatchNotification, pk=pk, recipient=request.user)
+    NotificationService.mark_notification_read(notification)
+    return redirect(notification.action_url or reverse('match_detail', kwargs={'pk': notification.match_id}))
+
+
+@login_required
+def notifications_center(request):
+    notifications_qs = MatchNotification.objects.filter(recipient=request.user).select_related('actor', 'match')
+    status_filter = request.GET.get('status', 'all')
+    type_filter = request.GET.get('type', 'all')
+
+    if status_filter == 'unread':
+        notifications_qs = notifications_qs.filter(is_read=False)
+    if type_filter != 'all':
+        notifications_qs = notifications_qs.filter(notification_type=type_filter)
+
+    notifications_qs = notifications_qs.order_by('-created_at')
+    paginator = Paginator(notifications_qs, 15)
+    page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(
+        request,
+        'matches/notifications_center.html',
         {
+            'page_obj': page_obj,
+            'status_filter': status_filter,
+            'type_filter': type_filter,
+            'notification_types': MatchNotification.Type.choices,
+        },
+    )
+
+
+@login_required
+def notifications_feed(request):
+    since_id = request.GET.get('since_id')
+    base_qs = MatchNotification.objects.filter(recipient=request.user)
+    latest = base_qs.select_related('match').order_by('-created_at')[:7]
+    incremental_qs = base_qs
+    if since_id and str(since_id).isdigit():
+        incremental_qs = incremental_qs.filter(id__gt=int(since_id))
+    else:
+        incremental_qs = incremental_qs.none()
+
+    def serialize(item):
+        return {
             'id': item.id,
+            'title': item.title,
             'message': item.message,
-            'match_id': item.match_id,
+            'notification_type': item.notification_type,
+            'action_url': item.action_url or reverse('match_detail', kwargs={'pk': item.match_id}),
+            'open_url': reverse('open_notification', kwargs={'pk': item.id}),
+            'action_label': item.action_label,
             'is_read': item.is_read,
             'created_at': item.created_at.strftime('%d/%m %H:%M'),
         }
-        for item in notifications
-    ]
+
+    payload = [serialize(item) for item in latest]
+    new_items = [serialize(item) for item in incremental_qs.order_by('id')[:20]]
     unread_count = MatchNotification.objects.filter(recipient=request.user, is_read=False).count()
-    return JsonResponse({'notifications': payload, 'unread_count': unread_count})
+    last_id = base_qs.order_by('-id').values_list('id', flat=True).first() or 0
+    return JsonResponse(
+        {
+            'notifications': payload,
+            'new_notifications': new_items,
+            'unread_count': unread_count,
+            'last_id': last_id,
+        }
+    )
