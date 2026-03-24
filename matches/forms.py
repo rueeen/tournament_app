@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from decks.models import Deck
 
@@ -18,7 +19,13 @@ class MatchCreateForm(forms.Form):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['participants'].queryset = User.objects.exclude(pk=user.pk)
+            self.fields['participants'].queryset = (
+                User.objects.filter(is_active=True)
+                .exclude(pk=user.pk)
+                .filter(Q(decks__isnull=False) | Q(is_superuser=True))
+                .distinct()
+                .order_by('username')
+            )
 
     def clean_participants(self):
         participants = self.cleaned_data['participants']
