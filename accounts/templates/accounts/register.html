@@ -2,9 +2,19 @@
 {% block title %}Registro{% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
-<div class="row justify-content-center"><div class="col-12 col-md-6">
-<div class="card bg-black border-secondary"><div class="card-body">
-<h1 class="h4">Crear cuenta</h1>
-<form method="post">{% csrf_token %}{{ form|crispy }}<button class="btn btn-success w-100">Registrarse</button></form>
-</div></div></div></div>
+<div class="row justify-content-center">
+  <div class="col-12 col-md-6 col-lg-5">
+    <div class="card register-card border-secondary">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-2">Crear cuenta</h1>
+        <p class="text-muted mb-4">Completa tus datos para comenzar a gestionar tus mazos y partidas.</p>
+        <form method="post">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <button class="btn btn-success w-100 mt-2">Registrarse</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}

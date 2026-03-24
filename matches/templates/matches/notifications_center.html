@@ -36,7 +36,7 @@
 
 <div class="list-group">
   {% for notification in page_obj %}
-    <div class="list-group-item bg-dark text-light {% if not notification.is_read %}border-primary{% endif %}">
+    <div class="list-group-item notification-card {% if not notification.is_read %}notification-card--unread{% endif %}">
       <div class="d-flex justify-content-between gap-3">
         <div>
           <small class="text-secondary d-block">{{ notification.created_at|date:"d/m/Y H:i" }}</small>

@@ -25,8 +25,9 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Perfil</a></li>
       </ul>
       <div class="dropdown me-3 notifications-wrapper">
-        <button class="btn btn-outline-light btn-sm position-relative notifications-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-          🔔
+        <button class="btn btn-outline-light btn-sm position-relative notifications-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Abrir notificaciones">
+          <span class="notifications-trigger__icon" aria-hidden="true">🔔</span>
+          <span class="notifications-trigger__label">Notificaciones</span>
           <span id="notifications-badge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if not unread_notifications_count %}d-none{% endif %}">{{ unread_notifications_count }}</span>
         </button>
         <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2 notifications-menu" id="notifications-menu">
@@ -54,9 +55,12 @@
           </div>
         </div>
       </div>
-      <form method="post" action="{% url 'logout' %}" class="d-inline">
+      <form method="post" action="{% url 'logout' %}" class="d-inline logout-form">
         {% csrf_token %}
-        <button class="btn btn-outline-light btn-sm" type="submit">Salir</button>
+        <button class="btn btn-outline-light btn-sm logout-btn" type="submit" aria-label="Cerrar sesión">
+          <span aria-hidden="true">↩</span>
+          <span>Cerrar sesión</span>
+        </button>
       </form>
       {% endif %}
     </div>
