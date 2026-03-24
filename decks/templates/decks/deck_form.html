@@ -136,7 +136,7 @@
       return {
         name: card.name,
         color_identity: card.color_identity || [],
-        image_url: card.image_uris?.art_crop || card.image_uris?.normal || imageFromFace?.art_crop || imageFromFace?.normal || '',
+        image_url: card.image_uris?.large || card.image_uris?.normal || card.image_uris?.art_crop || imageFromFace?.large || imageFromFace?.normal || imageFromFace?.art_crop || '',
         land_suggestion: buildLandSuggestion(card.color_identity || []),
       };
     });
