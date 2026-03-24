@@ -5,11 +5,14 @@ from django.contrib.auth import views as auth_views
 from django.urls import include, path, re_path
 from django.views.static import serve
 
-from core.views import custom_404, custom_500, dashboard
+from core.views import custom_404, custom_500, dashboard, delete_match, delete_player, superuser_panel
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', dashboard, name='dashboard'),
+    path('superuser/panel/', superuser_panel, name='superuser_panel'),
+    path('superuser/panel/players/<int:user_id>/delete/', delete_player, name='delete_player'),
+    path('superuser/panel/matches/<int:match_id>/delete/', delete_match, name='delete_match'),
     path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('accounts/', include('accounts.urls')),
