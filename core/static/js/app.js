@@ -2,14 +2,14 @@ window.addEventListener('load', () => {
   const isMobile = window.matchMedia('(max-width: 576px)').matches;
   const notyf = window.Notyf
     ? new Notyf({
-        duration: isMobile ? 4500 : 3500,
-        dismissible: isMobile,
-        position: { x: isMobile ? 'center' : 'right', y: 'top' },
-        types: [
-          { type: 'info', background: '#5ea2ff' },
-          { type: 'warning', background: '#f0ad4e' },
-        ],
-      })
+      duration: isMobile ? 4500 : 3500,
+      dismissible: isMobile,
+      position: { x: isMobile ? 'center' : 'right', y: 'top' },
+      types: [
+        { type: 'info', background: '#5ea2ff' },
+        { type: 'warning', background: '#f0ad4e' },
+      ],
+    })
     : null;
 
   const mapTag = (tags) => {
@@ -89,32 +89,47 @@ window.addEventListener('load', () => {
 
   const pollNotifications = async (fullRefresh = false) => {
     if (!feedUrl || !notificationItems) return;
+
     try {
       const url = new URL(feedUrl, window.location.origin);
+
       if (lastNotificationId > 0 && !fullRefresh) {
         url.searchParams.set('since_id', String(lastNotificationId));
       }
+
+      // evita cache del navegador/proxy
+      url.searchParams.set('_ts', Date.now().toString());
+
       const response = await fetch(url.toString(), {
         headers: { 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
+        cache: 'no-store',
       });
+
       if (!response.ok) return;
+
       const payload = await response.json();
       const items = payload.notifications || [];
       const newItems = payload.new_notifications || [];
+
       updateNotificationBadge(payload.unread_count || 0);
+
       if (fullRefresh || newItems.length > 0) {
         renderNotifications(items);
       }
+
       newItems.forEach(showToastIfNeeded);
-      if (payload.last_id) lastNotificationId = payload.last_id;
+
+      if (payload.last_id) {
+        lastNotificationId = payload.last_id;
+      }
     } catch (error) {
       console.debug('No se pudo actualizar el feed de notificaciones.', error);
     }
   };
 
   const startPolling = () => {
-    const intervalMs = document.hidden ? 45000 : 15000;
+    const intervalMs = document.hidden ? 15000 : 3000;
     if (pollTimer) {
       clearInterval(pollTimer);
     }
@@ -127,6 +142,14 @@ window.addEventListener('load', () => {
     document.addEventListener('visibilitychange', () => {
       startPolling();
       if (!document.hidden) pollNotifications();
+    });
+  }
+
+  const notificationsTrigger = document.querySelector('.notifications-trigger');
+
+  if (notificationsTrigger) {
+    notificationsTrigger.addEventListener('click', () => {
+      pollNotifications(true);
     });
   }
 
