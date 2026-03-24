@@ -1,0 +1,38 @@
+.notyf-fallback-container {
+  position: fixed;
+  z-index: 1085;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: min(420px, calc(100vw - 2rem));
+}
+
+.notyf-fallback-toast {
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 0.95rem;
+  padding: 0.75rem 0.9rem;
+  box-shadow: 0 0.35rem 1rem rgba(0, 0, 0, 0.25);
+  animation: notyf-fade-in 0.18s ease-out;
+}
+
+.notyf-fallback-toast--success { background: #198754; }
+.notyf-fallback-toast--error { background: #dc3545; }
+.notyf-fallback-toast--warning { background: #f0ad4e; color: #1e1e1e; }
+.notyf-fallback-toast--info { background: #5ea2ff; color: #0b1c3f; }
+
+@keyframes notyf-fade-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 576px) {
+  .notyf-fallback-container {
+    right: 50%;
+    transform: translateX(50%);
+    width: calc(100vw - 1rem);
+    top: 0.5rem;
+  }
+}
