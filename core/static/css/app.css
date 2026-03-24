@@ -280,3 +280,32 @@ a:hover { color: #c0dcff; }
     display: none;
   }
 }
+
+.mana-symbol {
+  width: 1.1rem;
+  height: 1.1rem;
+  vertical-align: middle;
+}
+
+.deck-color-icons {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 1.2rem;
+}
+
+.land-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.land-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(18, 31, 56, 0.78);
+  border: 1px solid var(--border);
+}
