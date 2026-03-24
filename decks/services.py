@@ -106,7 +106,12 @@ def _fetch_payload_from_url(url):
     for attempt in range(MAX_RETRIES + 1):
         try:
             with urlopen(request, timeout=DEFAULT_TIMEOUT_SECONDS) as response:
-                payload = json.loads(response.read().decode('utf-8'))
+                raw_text = response.read().decode('utf-8')
+                payload = _parse_payload_text(raw_text)
+                if payload is None:
+                    logger.warning('Scryfall returned invalid JSON url=%s', url)
+                    return None
+
                 _payload_cache[url] = (now + CACHE_TTL_SECONDS, payload)
                 return payload
         except HTTPError as exc:
@@ -129,9 +134,31 @@ def _fetch_payload_from_url(url):
                 continue
             logger.warning('Scryfall network error: %s url=%s', exc, url)
             return None
+
+    return None
+
+
+def _parse_payload_text(raw_text):
+    try:
+        payload = json.loads(raw_text)
+    except json.JSONDecodeError:
+        decoder = json.JSONDecoder()
+        try:
+            payload, _ = decoder.raw_decode(raw_text.lstrip())
         except json.JSONDecodeError:
-            logger.warning('Scryfall returned invalid JSON url=%s', url)
             return None
+
+    if isinstance(payload, str):
+        try:
+            reparsed = json.loads(payload)
+        except json.JSONDecodeError:
+            return None
+        if isinstance(reparsed, (dict, list)):
+            return reparsed
+        return None
+
+    if isinstance(payload, (dict, list)):
+        return payload
 
     return None
 
