@@ -7,8 +7,18 @@
   <div class="col-6 col-md-3"><div class="card-stat"><span>Partidas</span><strong>{{ global_stats.total_matches }}</strong></div></div>
   <div class="col-6 col-md-3"><div class="card-stat"><span>Finalizadas</span><strong>{{ global_stats.finalized_matches }}</strong></div></div>
 </div>
+
+<div class="card bg-black border-secondary p-3 mb-3">
+  <div class="d-flex flex-wrap gap-2 align-items-center">
+    <span class="text-secondary small me-1">Accesos rápidos:</span>
+    <a class="btn btn-outline-light btn-sm ranking-shortcut" href="#top-jugadores">Top jugadores</a>
+    <a class="btn btn-outline-light btn-sm ranking-shortcut" href="#top-mazos">Top mazos</a>
+    <a class="btn btn-outline-light btn-sm ranking-shortcut" href="#listado-mazos">Listado de mazos</a>
+  </div>
+</div>
+
 <div class="row g-3">
-  <div class="col-12 col-lg-6">
+  <div class="col-12 col-lg-6" id="top-jugadores">
     <div class="card bg-black border-secondary p-3">
       <h2 class="h6">Top jugadores por victorias</h2>
       <ol class="ranking-list mb-0">
@@ -28,6 +38,63 @@
       </ol>
     </div>
   </div>
-  <div class="col-12 col-lg-6"><div class="card bg-black border-secondary p-3"><h2 class="h6">Top mazos por victorias</h2><ol>{% for d in decks_by_wins %}<li>{{ d.name }} - {{ d.owner.username }} ({{ d.wins }})</li>{% empty %}<li>Sin datos.</li>{% endfor %}</ol></div></div>
+  <div class="col-12 col-lg-6" id="top-mazos">
+    <div class="card bg-black border-secondary p-3">
+      <h2 class="h6">Top mazos por victorias</h2>
+      <ol class="ranking-list mb-0">
+        {% for d in decks_by_wins %}
+          <li class="ranking-list__item">
+            <strong>{{ d.name }}</strong> · {{ d.owner.username }}
+            <small class="text-secondary">({{ d.wins }} victorias)</small>
+          </li>
+        {% empty %}
+          <li>Sin datos.</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 mt-1" id="listado-mazos">
+  <div class="col-12">
+    <div class="card bg-black border-secondary p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h6 mb-0">Listado de mazos y sus avatares</h2>
+        <small class="text-secondary">Mostrando {{ decks_with_owners|length }} mazos</small>
+      </div>
+      <div class="row g-3">
+        {% for deck in decks_with_owners %}
+          <div class="col-12 col-md-6 col-xl-4">
+            <div class="deck-ranking-item h-100">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                {% if deck.owner.profile.avatar %}
+                  <img class="avatar avatar-sm" src="{{ deck.owner.profile.avatar.url }}" alt="avatar de {{ deck.owner.username }}">
+                {% else %}
+                  <div class="avatar-placeholder avatar-sm">{{ deck.owner.username|first|upper }}</div>
+                {% endif %}
+                <div>
+                  <div class="fw-semibold">{{ deck.owner.username }}</div>
+                  <small class="text-secondary">{{ deck.wins }}W / {{ deck.losses }}L</small>
+                </div>
+              </div>
+              <div class="d-flex gap-2 align-items-start">
+                {% if deck.cover_image %}
+                  <img src="{{ deck.cover_image.url }}" class="deck-ranking-item__thumb" alt="{{ deck.name }}">
+                {% elif deck.cover_image_url %}
+                  <img src="{{ deck.cover_image_url }}" class="deck-ranking-item__thumb" alt="{{ deck.name }}">
+                {% endif %}
+                <div>
+                  <div class="fw-semibold">{{ deck.name }}</div>
+                  <small class="text-secondary">Win rate: {{ deck.win_rate }}%</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-secondary mb-0">No hay mazos para mostrar aún.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

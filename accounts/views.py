@@ -7,7 +7,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 from decks.models import Deck
 from matches.models import Match
 
-from .forms import ProfileForm, RegisterForm
+from .forms import ProfileCommentForm, ProfileForm, RegisterForm
+from .models import ProfileComment
 
 
 def register_view(request):
@@ -69,6 +70,19 @@ def players_list_view(request):
 def player_profile_view(request, user_id):
     player = get_object_or_404(User.objects.select_related('profile'), pk=user_id)
     decks = Deck.objects.filter(owner=player).prefetch_related('colors')
+    comments = ProfileComment.objects.filter(target=player).select_related('author', 'author__profile')
+
+    if request.method == 'POST':
+        comment_form = ProfileCommentForm(request.POST)
+        if comment_form.is_valid():
+            new_comment = comment_form.save(commit=False)
+            new_comment.author = request.user
+            new_comment.target = player
+            new_comment.save()
+            messages.success(request, 'Comentario publicado.')
+            return redirect('player_profile', user_id=player.id)
+    else:
+        comment_form = ProfileCommentForm()
 
     return render(
         request,
@@ -76,5 +90,7 @@ def player_profile_view(request, user_id):
         {
             'player': player,
             'decks': decks,
+            'comments': comments,
+            'comment_form': comment_form,
         },
     )
