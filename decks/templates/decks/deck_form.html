@@ -132,7 +132,7 @@
 
     resultsContainer.innerHTML = '<div class="text-secondary small">Buscando...</div>';
 
-    const scryfallQuery = `${query} type:legendary type:creature game:paper`;
+    const scryfallQuery = `${query} type:legendary (type:creature or (type:planeswalker oracle:"can be your commander")) game:paper`;
     const response = await fetch(`https://api.scryfall.com/cards/search?q=${encodeURIComponent(scryfallQuery)}`);
     const payload = await response.json();
     const results = (payload.data || []).slice(0, 8).map((card) => {
