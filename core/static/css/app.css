@@ -91,16 +91,20 @@ textarea:focus {
 
 .deck-card {
   overflow: hidden;
+  max-width: 60%;
+  margin: 0 auto;
 }
 
 .deck-cover {
   aspect-ratio: 63 / 88;
-  width: 100%;
+  width: 60%;
+  margin: 0.75rem auto 0;
   object-fit: contain;
   object-position: center;
   background: #050a16;
   padding: 0.35rem;
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
 }
 .avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
 .avatar-placeholder { width:96px; height:96px; border-radius:50%; background:#1a2950; display:flex; align-items:center; justify-content:center; font-size:2rem; border: 2px solid var(--border); }
@@ -115,3 +119,18 @@ textarea:focus {
 
 a { color: #91c4ff; }
 a:hover { color: #c0dcff; }
+
+.notifications-menu {
+  min-width: 320px;
+  max-width: 360px;
+}
+
+.notification-item {
+  white-space: normal;
+  border-radius: 8px;
+  margin-bottom: 0.35rem;
+}
+
+.notification-item--unread {
+  background: rgba(94, 162, 255, 0.18);
+}

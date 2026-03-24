@@ -28,6 +28,17 @@ window.addEventListener('load', () => {
     }
   });
 
+  document.querySelectorAll('#notification-events [data-notification-id]').forEach((item) => {
+    const notificationId = item.dataset.notificationId;
+    const storageKey = `notification-seen-${notificationId}`;
+    if (!notyf || localStorage.getItem(storageKey)) return;
+    notyf.open({
+      type: 'info',
+      message: item.textContent.trim(),
+    });
+    localStorage.setItem(storageKey, '1');
+  });
+
   document.querySelectorAll('form').forEach((form) => {
     form.addEventListener('submit', () => {
       const btn = form.querySelector('button[type="submit"]');

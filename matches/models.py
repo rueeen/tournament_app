@@ -130,3 +130,28 @@ class MatchResultAcceptance(models.Model):
 
     def __str__(self):
         return f'{self.user.username} - {self.decision}'
+
+
+class MatchNotification(models.Model):
+    class Type(models.TextChoices):
+        MATCH_CREATED = 'match_created', 'Partida creada'
+        INVITATION_ACCEPTED = 'invitation_accepted', 'Invitación aceptada'
+        INVITATION_REJECTED = 'invitation_rejected', 'Invitación rechazada'
+        RESULT_PROPOSED = 'result_proposed', 'Resultado propuesto'
+        RESULT_ACCEPTED = 'result_accepted', 'Resultado aceptado'
+        RESULT_REJECTED = 'result_rejected', 'Resultado rechazado'
+        MATCH_FINALIZED = 'match_finalized', 'Partida finalizada'
+
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='match_notifications')
+    actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='triggered_match_notifications')
+    match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name='notifications')
+    notification_type = models.CharField(max_length=32, choices=Type.choices)
+    message = models.CharField(max_length=220)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'Notificación para {self.recipient.username}: {self.message}'
