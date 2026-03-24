@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     'core',
     'accounts',
     'decks',
-    'matches',
+    'matches.apps.MatchesConfig',
     'rankings',
 ]
 

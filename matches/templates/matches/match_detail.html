@@ -3,7 +3,18 @@
 <h1 class="h4">Detalle partida #{{ match.id }}</h1>
 <p>Estado: <span class="badge text-bg-info">{{ match.get_status_display }}</span></p>
 <div class="card bg-black border-secondary p-3 mb-3"><h2 class="h6">Jugadores</h2>
-<ul>{% for mp in match.players.all %}<li>{{ mp.user.username }} — {{ mp.deck.name }}</li>{% endfor %}</ul></div>
+<ul class="list-unstyled mb-0">
+  {% for mp in match.players.all %}
+  <li class="d-flex align-items-center gap-2 py-1">
+    {% if mp.user.profile.avatar %}
+      <img class="avatar avatar-sm" src="{{ mp.user.profile.avatar.url }}" alt="avatar {{ mp.user.username }}">
+    {% else %}
+      <div class="avatar-placeholder avatar-sm">{{ mp.user.username|first|upper }}</div>
+    {% endif %}
+    <span>{{ mp.user.username }} — {{ mp.deck.name }}</span>
+  </li>
+  {% endfor %}
+</ul></div>
 <div class="card bg-black border-secondary p-3 mb-3"><h2 class="h6">Invitaciones</h2>{% for i in match.invitations.all %}<p>{{ i.invited_user.username }}: {{ i.get_status_display }}</p>{% empty %}<p class="text-secondary">Sin invitaciones.</p>{% endfor %}</div>
 {% if match.status == match.Status.FINALIZED and latest_proposal %}
 <div class="card bg-black border-success p-3 mb-3">
