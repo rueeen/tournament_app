@@ -19,7 +19,7 @@ class SearchCommandersTests(SimpleTestCase):
                     'name': 'Cloud, Ex-SOLDIER',
                     'type_line': 'Legendary Creature — Human Soldier',
                     'color_identity': ['R', 'W'],
-                    'image_uris': {'art_crop': 'https://img.test/cloud.jpg'},
+                    'image_uris': {'large': 'https://img.test/cloud-large.jpg', 'art_crop': 'https://img.test/cloud.jpg'},
                 }
             ]
 
@@ -56,6 +56,7 @@ class SearchCommandersTests(SimpleTestCase):
             'card_faces': [
                 {
                     'image_uris': {
+                        'large': 'https://img.test/face-large.jpg',
                         'normal': 'https://img.test/face.jpg',
                     }
                 }
@@ -64,7 +65,7 @@ class SearchCommandersTests(SimpleTestCase):
 
         payload = services.serialize_commander(card)
 
-        self.assertEqual(payload['image_url'], 'https://img.test/face.jpg')
+        self.assertEqual(payload['image_url'], 'https://img.test/face-large.jpg')
 
 
 class ScryfallClientBehaviorTests(SimpleTestCase):

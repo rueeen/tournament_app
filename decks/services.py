@@ -224,13 +224,13 @@ def serialize_commander(card):
 def _extract_image_url(card):
     image_uris = card.get('image_uris') or {}
     if image_uris:
-        return image_uris.get('art_crop') or image_uris.get('normal', '')
+        return image_uris.get('large') or image_uris.get('normal') or image_uris.get('art_crop', '')
 
     card_faces = card.get('card_faces') or []
     for face in card_faces:
         face_uris = (face or {}).get('image_uris') or {}
         if face_uris:
-            return face_uris.get('art_crop') or face_uris.get('normal', '')
+            return face_uris.get('large') or face_uris.get('normal') or face_uris.get('art_crop', '')
 
     return ''
 
