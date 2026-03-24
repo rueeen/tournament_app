@@ -8,7 +8,26 @@
   <div class="col-6 col-md-3"><div class="card-stat"><span>Finalizadas</span><strong>{{ global_stats.finalized_matches }}</strong></div></div>
 </div>
 <div class="row g-3">
-  <div class="col-12 col-lg-6"><div class="card bg-black border-secondary p-3"><h2 class="h6">Top jugadores por victorias</h2><ol>{% for u in players_by_wins %}<li>{{ u.username }} ({{ u.profile.wins }} victorias)</li>{% empty %}<li>Sin datos.</li>{% endfor %}</ol></div></div>
+  <div class="col-12 col-lg-6">
+    <div class="card bg-black border-secondary p-3">
+      <h2 class="h6">Top jugadores por victorias</h2>
+      <ol class="ranking-list mb-0">
+        {% for u in players_by_wins %}
+          <li class="ranking-list__item d-flex align-items-center gap-2">
+            {% if u.profile.avatar %}
+              <img class="avatar avatar-sm" src="{{ u.profile.avatar.url }}" alt="avatar de {{ u.username }}">
+            {% else %}
+              <div class="avatar-placeholder avatar-sm">{{ u.username|first|upper }}</div>
+            {% endif %}
+            <a class="ranking-list__link" href="{% url 'player_profile' u.id %}">{{ u.username }}</a>
+            <small class="text-secondary">({{ u.profile.wins }} victorias)</small>
+          </li>
+        {% empty %}
+          <li>Sin datos.</li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
   <div class="col-12 col-lg-6"><div class="card bg-black border-secondary p-3"><h2 class="h6">Top mazos por victorias</h2><ol>{% for d in decks_by_wins %}<li>{{ d.name }} - {{ d.owner.username }} ({{ d.wins }})</li>{% empty %}<li>Sin datos.</li>{% endfor %}</ol></div></div>
 </div>
 {% endblock %}
