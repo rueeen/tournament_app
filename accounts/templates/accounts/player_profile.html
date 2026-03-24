@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h4">Perfil de {{ player.username }}</h1>
+  <a href="{% url 'players_list' %}" class="btn btn-outline-secondary btn-sm">Volver a jugadores</a>
+</div>
+
+<div class="row g-3 profile-layout">
+  <div class="col-12 col-md-4">
+    <div class="card bg-black border-secondary p-3 text-center profile-card-main">
+      {% if player.profile.avatar %}
+        <img class="avatar mx-auto mb-2" src="{{ player.profile.avatar.url }}" alt="avatar de {{ player.username }}">
+      {% else %}
+        <div class="avatar-placeholder mx-auto mb-2">{{ player.username|first|upper }}</div>
+      {% endif %}
+      <h2 class="h5 mb-1">{{ player.username }}</h2>
+      <p class="text-secondary mb-1">Partidas: {{ player.profile.total_matches }}</p>
+      <p class="mb-0">Win rate: {{ player.profile.win_rate }}%</p>
+    </div>
+  </div>
+
+  <div class="col-12 col-md-8">
+    <div class="card bg-black border-secondary p-3 profile-card-stats">
+      <h3 class="h6 mb-3">Mazos de {{ player.username }}</h3>
+      <div class="row g-3">
+        {% for deck in decks %}
+          <div class="col-12 col-lg-6">
+            <div class="card bg-black border-secondary h-100 deck-card deck-card--compact">
+              {% if deck.cover_image %}
+                <img src="{{ deck.cover_image.url }}" class="card-img-top deck-cover deck-cover--compact" alt="{{ deck.name }}">
+              {% elif deck.cover_image_url %}
+                <img src="{{ deck.cover_image_url }}" class="card-img-top deck-cover deck-cover--compact" alt="{{ deck.name }}">
+              {% endif %}
+              <div class="card-body">
+                <h4 class="h6 mb-1">{{ deck.name }}</h4>
+                <p class="small text-secondary mb-1">
+                  {% for c in deck.colors.all %}
+                    {{ c.get_name_display }}{% if not forloop.last %}, {% endif %}
+                  {% empty %}
+                    Sin colores
+                  {% endfor %}
+                </p>
+                <p class="small mb-0">W/L: {{ deck.wins }}/{{ deck.losses }} · {{ deck.win_rate }}% WR</p>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-secondary mb-0">Este jugador aún no registró mazos.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

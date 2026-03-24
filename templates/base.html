@@ -24,6 +24,7 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'match_list' %}">Mis partidas</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'invitation_list' %}">Invitaciones</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'ranking_dashboard' %}">Rankings</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'players_list' %}">Jugadores</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Perfil</a></li>
         {% if user.is_superuser %}<li class="nav-item"><a class="nav-link text-warning" href="{% url 'superuser_panel' %}">Panel admin</a></li>{% endif %}
       </ul>
