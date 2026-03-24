@@ -40,6 +40,8 @@ class Match(models.Model):
             with transaction.atomic():
                 self.status = Match.Status.FINALIZED
                 self.save(update_fields=['status', 'updated_at'])
+                proposal.is_active = False
+                proposal.save(update_fields=['is_active'])
                 proposal.apply_stats()
             return True
         return False

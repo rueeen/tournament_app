@@ -16,6 +16,21 @@ body.app-body {
   background: radial-gradient(circle at top, #1b2b55 0%, var(--bg) 52%, #070b17 100%);
 }
 
+.app-body h1,
+.app-body h2,
+.app-body h3,
+.app-body h4,
+.app-body h5,
+.app-body h6,
+.app-body p,
+.app-body li,
+.app-body label,
+.app-body small,
+.app-body .card-title,
+.app-body .card-text {
+  color: var(--text);
+}
+
 .navbar,
 .card,
 .list-group-item,
@@ -28,6 +43,7 @@ body.app-body {
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
   box-shadow: 0 14px 35px rgba(7, 11, 23, 0.35);
+  color: var(--text) !important;
 }
 
 .card-stat { background: var(--surface-2); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center; }
@@ -76,7 +92,14 @@ textarea:focus {
 .deck-cover { max-height: 180px; object-fit: cover; border-radius: 10px; }
 .avatar { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
 .avatar-placeholder { width:96px; height:96px; border-radius:50%; background:#1a2950; display:flex; align-items:center; justify-content:center; font-size:2rem; border: 2px solid var(--border); }
-.list-group-item { background: var(--surface); color: var(--text); border-color: var(--border); }
+.list-group-item,
+.table,
+.table th,
+.table td {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
 
 a { color: #91c4ff; }
 a:hover { color: #c0dcff; }
