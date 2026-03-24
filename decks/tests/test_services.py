@@ -68,6 +68,22 @@ class SearchCommandersTests(SimpleTestCase):
 
 
 class ScryfallClientBehaviorTests(SimpleTestCase):
+
+    def test_parse_payload_text_supports_escaped_json_string(self):
+        raw_text = '"{\"object\":\"list\",\"data\":[{\"id\":\"abc\"}]}"'
+
+        payload = services._parse_payload_text(raw_text)
+
+        self.assertEqual(payload.get('object'), 'list')
+        self.assertEqual(payload.get('data')[0]['id'], 'abc')
+
+    def test_parse_payload_text_supports_concatenated_json(self):
+        raw_text = '{"object":"list","data":[{"id":"first"}],"has_more":false}{"object":"list","data":[{"id":"second"}]}'
+
+        payload = services._parse_payload_text(raw_text)
+
+        self.assertEqual(payload.get('data')[0]['id'], 'first')
+
     def test_fetch_cards_paginated_uses_next_page_until_limit(self):
         with patch('decks.services._fetch_payload_from_url') as mock_payload:
             mock_payload.side_effect = [
