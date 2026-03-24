@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h4">Detalle partida #{{ match.id }}</h1>
+<p>Estado: <span class="badge text-bg-info">{{ match.get_status_display }}</span></p>
+<div class="card bg-black border-secondary p-3 mb-3"><h2 class="h6">Jugadores</h2>
+<ul>{% for mp in match.players.all %}<li>{{ mp.user.username }} — {{ mp.deck.name }}</li>{% endfor %}</ul></div>
+<div class="card bg-black border-secondary p-3 mb-3"><h2 class="h6">Invitaciones</h2>{% for i in match.invitations.all %}<p>{{ i.invited_user.username }}: {{ i.get_status_display }}</p>{% empty %}<p class="text-secondary">Sin invitaciones.</p>{% endfor %}</div>
+{% if active_proposal %}
+<div class="card bg-black border-warning p-3 mb-3"><h2 class="h6">Resultado propuesto</h2><p>Ganador: <strong>{{ active_proposal.winner.username }}</strong></p><p>Propuesto por: {{ active_proposal.proposed_by.username }}</p><a class="btn btn-sm btn-outline-light" href="{% url 'decide_result' active_proposal.id %}">Aceptar/Rechazar</a></div>
+{% else %}
+<a class="btn btn-primary" href="{% url 'propose_result' match.id %}">Proponer resultado</a>
+{% endif %}
+{% endblock %}

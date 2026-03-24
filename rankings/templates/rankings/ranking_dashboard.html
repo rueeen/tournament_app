@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h4 mb-3">Rankings globales</h1>
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3"><div class="card-stat"><span>Jugadores</span><strong>{{ global_stats.total_players }}</strong></div></div>
+  <div class="col-6 col-md-3"><div class="card-stat"><span>Mazos</span><strong>{{ global_stats.total_decks }}</strong></div></div>
+  <div class="col-6 col-md-3"><div class="card-stat"><span>Partidas</span><strong>{{ global_stats.total_matches }}</strong></div></div>
+  <div class="col-6 col-md-3"><div class="card-stat"><span>Finalizadas</span><strong>{{ global_stats.finalized_matches }}</strong></div></div>
+</div>
+<div class="row g-3">
+  <div class="col-12 col-lg-6"><div class="card bg-black border-secondary p-3"><h2 class="h6">Top jugadores por victorias</h2><ol>{% for u in players_by_wins %}<li>{{ u.username }} ({{ u.profile.wins }} victorias)</li>{% empty %}<li>Sin datos.</li>{% endfor %}</ol></div></div>
+  <div class="col-12 col-lg-6"><div class="card bg-black border-secondary p-3"><h2 class="h6">Top mazos por victorias</h2><ol>{% for d in decks_by_wins %}<li>{{ d.name }} - {{ d.owner.username }} ({{ d.wins }})</li>{% empty %}<li>Sin datos.</li>{% endfor %}</ol></div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h4">Mis partidas</h1><a class="btn btn-primary" href="{% url 'match_create' %}">Crear partida</a></div>
+<h2 class="h6">Partidas donde participo</h2>
+<div class="list-group mb-3">{% for m in matches %}<a class="list-group-item list-group-item-action" href="{% url 'match_detail' m.id %}">Partida #{{ m.id }} - {{ m.get_status_display }}</a>{% empty %}<div class="list-group-item">No hay partidas.</div>{% endfor %}</div>
+<h2 class="h6">Partidas creadas por mí</h2>
+<div class="list-group">{% for m in created_matches %}<a class="list-group-item list-group-item-action" href="{% url 'match_detail' m.id %}">Partida #{{ m.id }} - {{ m.get_status_display }}</a>{% empty %}<div class="list-group-item">No has creado partidas.</div>{% endfor %}</div>
+{% endblock %}
