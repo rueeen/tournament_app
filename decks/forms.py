@@ -15,10 +15,25 @@ class DeckForm(forms.ModelForm):
         fields = ('name', 'cover_image_url', 'colors')
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self._ensure_default_colors()
         self.fields['colors'].queryset = DeckColor.objects.order_by('name')
         self.fields['cover_image_url'].widget = forms.HiddenInput()
+
+    def clean_name(self):
+        name = self.cleaned_data.get('name', '').strip()
+        if not name:
+            return name
+
+        if self.user is not None:
+            queryset = Deck.objects.filter(owner=self.user, name__iexact=name)
+            if self.instance and self.instance.pk:
+                queryset = queryset.exclude(pk=self.instance.pk)
+            if queryset.exists():
+                raise forms.ValidationError('Ya tienes un mazo con ese nombre.')
+
+        return name
 
     def _ensure_default_colors(self):
         for color_value, _ in DeckColor.ColorChoices.choices:

@@ -17,7 +17,7 @@ def deck_list(request):
 @login_required
 def deck_create(request):
     if request.method == 'POST':
-        form = DeckForm(request.POST)
+        form = DeckForm(request.POST, user=request.user)
         if form.is_valid():
             deck = form.save(commit=False)
             deck.owner = request.user
@@ -26,7 +26,7 @@ def deck_create(request):
             messages.success(request, 'Mazo creado correctamente.')
             return redirect('deck_list')
     else:
-        form = DeckForm()
+        form = DeckForm(user=request.user)
     return render(request, 'decks/deck_form.html', {'form': form, 'title': 'Crear mazo'})
 
 
@@ -34,13 +34,13 @@ def deck_create(request):
 def deck_update(request, pk):
     deck = get_object_or_404(Deck, pk=pk, owner=request.user)
     if request.method == 'POST':
-        form = DeckForm(request.POST, instance=deck)
+        form = DeckForm(request.POST, instance=deck, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Mazo actualizado correctamente.')
             return redirect('deck_list')
     else:
-        form = DeckForm(instance=deck)
+        form = DeckForm(instance=deck, user=request.user)
     return render(request, 'decks/deck_form.html', {'form': form, 'title': 'Editar mazo'})
 
 
