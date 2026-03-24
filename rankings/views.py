@@ -32,6 +32,7 @@ def ranking_dashboard(request):
     )
 
     players_by_games = User.objects.order_by('-profile__total_matches', '-profile__wins')[:10]
+    decks_with_owners = Deck.objects.select_related('owner', 'owner__profile').order_by('-wins', '-total_matches', 'name')[:24]
 
     global_stats = {
         'total_players': User.objects.count(),
@@ -51,5 +52,6 @@ def ranking_dashboard(request):
             'color_rankings': color_rankings,
             'players_by_games': players_by_games,
             'global_stats': global_stats,
+            'decks_with_owners': decks_with_owners,
         },
     )
