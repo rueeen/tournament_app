@@ -19,7 +19,7 @@
       <img id="commander-preview-image" src="" alt="Comandante" style="width:140px; border-radius:0.5rem;">
       <div>
         <h2 id="commander-preview-name" class="h6 mb-2"></h2>
-        <p id="commander-land-suggestion" class="mb-0 small text-secondary"></p>
+        <div id="commander-land-suggestion" class="mb-0 small text-secondary"></div>
       </div>
     </div>
   </div>
@@ -47,21 +47,22 @@
     G: 'Verde',
   };
   const basicLandByCode = {
-    W: 'Plains',
-    U: 'Island',
-    B: 'Swamp',
-    R: 'Mountain',
-    G: 'Forest',
+    W: { name: 'Planicie', symbol: 'W' },
+    U: { name: 'Isla', symbol: 'U' },
+    B: { name: 'Pantano', symbol: 'B' },
+    R: { name: 'Montaña', symbol: 'R' },
+    G: { name: 'Bosque', symbol: 'G' },
   };
 
   function buildLandSuggestion(colorIdentity) {
     if (!colorIdentity.length) {
-      return [{ land: 'Wastes', count: 36 }];
+      return [{ land: 'Yermo', count: 36, symbol: 'C' }];
     }
     const perColor = Math.floor(36 / colorIdentity.length);
     const remainder = 36 % colorIdentity.length;
     return colorIdentity.map((color, index) => ({
-      land: basicLandByCode[color] || 'Land',
+      land: basicLandByCode[color]?.name || 'Tierra',
+      symbol: basicLandByCode[color]?.symbol || 'C',
       count: perColor + (index < remainder ? 1 : 0),
     }));
   }
@@ -115,7 +116,10 @@
     }
 
     previewName.textContent = result.name;
-    previewLands.textContent = `Tierras base sugeridas (36): ${result.land_suggestion.map((item) => `${item.count} ${item.land}`).join(', ')}`;
+    const landItems = result.land_suggestion
+      .map((item) => `<span class="land-pill"><img src="https://svgs.scryfall.io/card-symbols/${item.symbol}.svg" alt="${item.land}" class="mana-symbol">${item.count} ${item.land}</span>`)
+      .join('');
+    previewLands.innerHTML = `<span class="d-block mb-1">Tierras base sugeridas (36):</span><div class="land-pill-list">${landItems}</div>`;
     previewContainer.classList.remove('d-none');
   }
 
