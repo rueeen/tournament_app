@@ -79,10 +79,15 @@ def invitation_respond(request, pk, decision):
 @login_required
 def match_detail(request, pk):
     match = get_object_or_404(Match.objects.prefetch_related('players__user', 'players__deck', 'invitations'), pk=pk)
-    if not match.players.filter(user=request.user).exists() and match.created_by_id != request.user.id:
+    is_participant = match.players.filter(user=request.user).exists()
+    has_invitation = match.invitations.filter(invited_user=request.user).exists()
+    can_view_match = is_participant or has_invitation or match.created_by_id == request.user.id
+    if not can_view_match:
         messages.error(request, 'No tienes permiso para ver esta partida.')
         return redirect('match_list')
 
+    all_invitations_accepted = not match.invitations.exclude(status=MatchInvitation.Status.ACCEPTED).exists()
+    can_propose_result = is_participant and match.status != Match.Status.FINALIZED and all_invitations_accepted
     active_proposal = match.result_proposals.filter(is_active=True).first()
     latest_proposal = match.result_proposals.first()
     my_acceptance = None
@@ -92,7 +97,14 @@ def match_detail(request, pk):
     return render(
         request,
         'matches/match_detail.html',
-        {'match': match, 'active_proposal': active_proposal, 'latest_proposal': latest_proposal, 'my_acceptance': my_acceptance},
+        {
+            'match': match,
+            'active_proposal': active_proposal,
+            'latest_proposal': latest_proposal,
+            'my_acceptance': my_acceptance,
+            'can_propose_result': can_propose_result,
+            'all_invitations_accepted': all_invitations_accepted,
+        },
     )
 
 
@@ -102,6 +114,9 @@ def propose_result(request, pk):
     match = get_object_or_404(Match, pk=pk)
     if not match.players.filter(user=request.user).exists():
         messages.error(request, 'Solo participantes pueden proponer resultados.')
+        return redirect('match_detail', pk=pk)
+    if match.invitations.exclude(status=MatchInvitation.Status.ACCEPTED).exists():
+        messages.error(request, 'No se puede proponer resultado hasta que todas las invitaciones estén aceptadas.')
         return redirect('match_detail', pk=pk)
     if match.status == Match.Status.FINALIZED:
         messages.info(request, 'La partida ya está finalizada y no admite nuevos resultados.')
