@@ -24,6 +24,28 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'ranking_dashboard' %}">Rankings</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Perfil</a></li>
       </ul>
+      <div class="dropdown me-3">
+        <button class="btn btn-outline-light btn-sm position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          🔔
+          {% if unread_notifications_count %}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unread_notifications_count }}</span>
+          {% endif %}
+        </button>
+        <div class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2 notifications-menu">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>Notificaciones</strong>
+            <a href="{% url 'mark_notifications_read' %}?next={{ request.path }}" class="small">Marcar leídas</a>
+          </div>
+          {% for notification in header_notifications %}
+            <a class="dropdown-item notification-item {% if not notification.is_read %}notification-item--unread{% endif %}" href="{% url 'match_detail' notification.match.id %}">
+              <small class="d-block text-secondary">{{ notification.created_at|date:"d/m H:i" }}</small>
+              <span>{{ notification.message }}</span>
+            </a>
+          {% empty %}
+            <p class="text-secondary small mb-0">No hay notificaciones todavía.</p>
+          {% endfor %}
+        </div>
+      </div>
       <form method="post" action="{% url 'logout' %}" class="d-inline">
         {% csrf_token %}
         <button class="btn btn-outline-light btn-sm" type="submit">Salir</button>
@@ -36,6 +58,13 @@
   <div id="notyf-messages" class="d-none">
   {% for message in messages %}
     <div data-tags="{{ message.tags|default:'info' }}">{{ message }}</div>
+  {% endfor %}
+  </div>
+  <div id="notification-events" class="d-none">
+  {% for notification in header_notifications %}
+    {% if not notification.is_read %}
+      <div data-notification-id="{{ notification.id }}">{{ notification.message }}</div>
+    {% endif %}
   {% endfor %}
   </div>
   {% block content %}{% endblock %}
