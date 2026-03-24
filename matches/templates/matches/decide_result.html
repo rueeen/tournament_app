@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h4 mb-3">Confirmar resultado</h1>
+<p>Partida #{{ proposal.match.id }} — Ganador propuesto: <strong>{{ proposal.winner.username }}</strong></p>
+<div class="card bg-black border-secondary p-3"><form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">Enviar decisión</button></form></div>
+{% endblock %}

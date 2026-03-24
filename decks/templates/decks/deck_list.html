@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3"><h1 class="h4">Mis mazos</h1><a class="btn btn-primary" href="{% url 'deck_create' %}">Nuevo mazo</a></div>
+<div class="row g-3">
+{% for deck in decks %}
+<div class="col-12 col-md-6 col-lg-4">
+  <div class="card bg-black border-secondary h-100">
+    {% if deck.cover_image %}<img src="{{ deck.cover_image.url }}" class="card-img-top deck-cover" alt="{{ deck.name }}">{% endif %}
+    <div class="card-body">
+      <h2 class="h6">{{ deck.name }}</h2>
+      <p class="small text-secondary mb-1">{% for c in deck.colors.all %}{{ c.get_name_display }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+      <p class="small mb-1">W/L: {{ deck.wins }}/{{ deck.losses }}</p>
+      <p class="small mb-2">Win rate: {{ deck.win_rate }}%</p>
+      <a class="btn btn-sm btn-outline-info" href="{% url 'deck_update' deck.id %}">Editar</a>
+      <a class="btn btn-sm btn-outline-danger" href="{% url 'deck_delete' deck.id %}">Eliminar</a>
+    </div>
+  </div>
+</div>
+{% empty %}<p class="text-secondary">No tienes mazos registrados.</p>{% endfor %}
+</div>
+{% endblock %}

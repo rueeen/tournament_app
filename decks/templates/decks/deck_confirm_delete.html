@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card bg-black border-danger p-3"><h1 class="h5">Eliminar mazo</h1><p>¿Seguro que deseas eliminar <strong>{{ deck.name }}</strong>?</p>
+<form method="post">{% csrf_token %}<button class="btn btn-danger">Eliminar</button> <a class="btn btn-secondary" href="{% url 'deck_list' %}">Cancelar</a></form></div>
+{% endblock %}

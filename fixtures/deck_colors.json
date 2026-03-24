@@ -1,0 +1,7 @@
+[
+  {"model": "decks.deckcolor", "pk": 1, "fields": {"name": "green"}},
+  {"model": "decks.deckcolor", "pk": 2, "fields": {"name": "black"}},
+  {"model": "decks.deckcolor", "pk": 3, "fields": {"name": "white"}},
+  {"model": "decks.deckcolor", "pk": 4, "fields": {"name": "blue"}},
+  {"model": "decks.deckcolor", "pk": 5, "fields": {"name": "red"}}
+]

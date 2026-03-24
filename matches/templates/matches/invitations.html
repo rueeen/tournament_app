@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="h4 mb-3">Invitaciones pendientes</h1>
+{% for inv in invitations %}
+<div class="card bg-black border-secondary p-3 mb-2">
+  <p class="mb-1">Partida #{{ inv.match.id }} invitado por {{ inv.invited_by.username }}</p>
+  <form method="post" action="{% url 'invitation_respond' inv.id 'accept' %}" class="d-flex gap-2">{% csrf_token %}
+    <select name="deck_id" class="form-select">{% for d in user.decks.all %}<option value="{{ d.id }}">{{ d.name }}</option>{% endfor %}</select>
+    <button class="btn btn-success">Aceptar</button>
+  </form>
+  <form method="post" action="{% url 'invitation_respond' inv.id 'reject' %}" class="mt-2">{% csrf_token %}<button class="btn btn-outline-danger">Rechazar</button></form>
+</div>
+{% empty %}<p class="text-secondary">No tienes invitaciones pendientes.</p>{% endfor %}
+{% endblock %}
