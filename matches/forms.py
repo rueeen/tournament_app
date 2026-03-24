@@ -8,6 +8,7 @@ from .models import Match, MatchInvitation, MatchPlayer, MatchResultAcceptance, 
 
 class MatchCreateForm(forms.Form):
     participants = forms.ModelMultipleChoiceField(
+        label='Participantes',
         queryset=User.objects.all(),
         required=True,
         widget=forms.SelectMultiple(attrs={'class': 'form-select'}),

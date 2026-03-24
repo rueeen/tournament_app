@@ -8,6 +8,7 @@
   --muted: #a9b8d8;
   --primary: #5ea2ff;
   --success: #38d39f;
+  --danger: #ff7e9b;
 }
 
 body.app-body {
@@ -68,6 +69,26 @@ textarea:focus {
 .form-label { color: var(--text) !important; }
 .form-check-label { color: var(--text) !important; }
 .text-secondary { color: var(--muted) !important; }
+.text-muted,
+.form-text {
+  color: #c5d2ed !important;
+}
+
+.invalid-feedback,
+.text-danger,
+.app-body .alert-danger {
+  color: var(--danger) !important;
+}
+
+ul.errorlist,
+ul.errorlist li {
+  color: var(--danger);
+}
+
+.app-body .alert-danger {
+  background: rgba(140, 21, 61, 0.18);
+  border-color: rgba(255, 126, 155, 0.45);
+}
 
 .form-check-input {
   background-color: rgba(9, 16, 32, 0.8);
@@ -123,16 +144,27 @@ a:hover { color: #c0dcff; }
 .notifications-menu {
   min-width: 320px;
   max-width: 360px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
 .notification-item {
   white-space: normal;
   border-radius: 8px;
   margin-bottom: 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid transparent;
+}
+
+.notification-item:hover {
+  background: rgba(120, 156, 236, 0.2);
+  border-color: rgba(167, 190, 245, 0.45);
 }
 
 .notification-item--unread {
   background: rgba(94, 162, 255, 0.18);
+  border-color: rgba(125, 177, 255, 0.35);
 }
 
 
@@ -175,6 +207,55 @@ a:hover { color: #c0dcff; }
   padding: 0.65rem 0.35rem;
 }
 
+.notifications-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-color: rgba(199, 214, 249, 0.6);
+}
+
+.notifications-trigger__label {
+  font-size: 0.78rem;
+}
+
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-color: rgba(255, 170, 170, 0.75);
+  color: #ffd8d8;
+}
+
+.logout-btn:hover,
+.logout-btn:focus {
+  background: rgba(192, 47, 84, 0.25);
+  border-color: rgba(255, 167, 189, 0.9);
+  color: #ffe7e7;
+}
+
+.notification-card {
+  background: rgba(16, 29, 55, 0.82);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.notification-card--unread {
+  border-color: rgba(94, 162, 255, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(94, 162, 255, 0.25);
+}
+
+.register-card {
+  background: rgba(9, 17, 34, 0.93) !important;
+}
+
+.register-card .card-body,
+.register-card .card-body p,
+.register-card .card-body li,
+.register-card .card-body label,
+.register-card .card-body span {
+  color: var(--text);
+}
+
 @media (max-width: 767px) {
   .profile-layout {
     margin-bottom: 1.5rem;
@@ -193,5 +274,9 @@ a:hover { color: #c0dcff; }
   .profile-save-btn {
     width: 100%;
     margin-top: 0.35rem;
+  }
+
+  .notifications-trigger__label {
+    display: none;
   }
 }
