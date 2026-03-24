@@ -9,7 +9,7 @@ from .models import Match, MatchInvitation, MatchPlayer, MatchResultAcceptance, 
 class MatchCreateForm(forms.Form):
     participants = forms.ModelMultipleChoiceField(
         label='Participantes',
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(is_superuser=False),
         required=True,
         widget=forms.SelectMultiple(attrs={'class': 'form-select'}),
         help_text='Selecciona entre 1 y 3 jugadores adicionales.',
@@ -18,7 +18,7 @@ class MatchCreateForm(forms.Form):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         if user:
-            self.fields['participants'].queryset = User.objects.exclude(pk=user.pk)
+            self.fields['participants'].queryset = User.objects.filter(is_superuser=False).exclude(pk=user.pk)
 
     def clean_participants(self):
         participants = self.cleaned_data['participants']
