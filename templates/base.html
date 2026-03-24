@@ -70,6 +70,20 @@
     </div>
   </div>
 </nav>
+{% if user.is_authenticated %}
+<section class="quick-nav border-bottom border-secondary">
+  <div class="container-fluid py-2">
+    <div class="quick-nav__scroller" aria-label="Accesos directos">
+      <a class="quick-nav__chip {% if request.resolver_match.url_name == 'dashboard' %}quick-nav__chip--active{% endif %}" href="{% url 'dashboard' %}">🏠 Inicio</a>
+      <a class="quick-nav__chip {% if request.resolver_match.url_name == 'deck_list' %}quick-nav__chip--active{% endif %}" href="{% url 'deck_list' %}">🃏 Mazos</a>
+      <a class="quick-nav__chip {% if request.resolver_match.url_name == 'match_list' %}quick-nav__chip--active{% endif %}" href="{% url 'match_list' %}">⚔️ Partidas</a>
+      <a class="quick-nav__chip {% if request.resolver_match.url_name == 'invitation_list' %}quick-nav__chip--active{% endif %}" href="{% url 'invitation_list' %}">📩 Invitaciones</a>
+      <a class="quick-nav__chip {% if request.resolver_match.url_name == 'ranking_dashboard' %}quick-nav__chip--active{% endif %}" href="{% url 'ranking_dashboard' %}">📊 Ranking</a>
+      <a class="quick-nav__chip {% if request.resolver_match.url_name == 'players_list' %}quick-nav__chip--active{% endif %}" href="{% url 'players_list' %}">👥 Jugadores</a>
+    </div>
+  </div>
+</section>
+{% endif %}
 <main class="container py-3">
   <div id="notyf-messages" class="d-none">
   {% for message in messages %}
@@ -85,6 +99,30 @@
   </div>
   {% block content %}{% endblock %}
 </main>
+{% if user.is_authenticated %}
+<nav class="mobile-shortcuts" aria-label="Navegación rápida móvil">
+  <a class="mobile-shortcuts__item {% if request.resolver_match.url_name == 'dashboard' %}mobile-shortcuts__item--active{% endif %}" href="{% url 'dashboard' %}">
+    <span aria-hidden="true">🏠</span>
+    <small>Inicio</small>
+  </a>
+  <a class="mobile-shortcuts__item {% if request.resolver_match.url_name == 'deck_list' %}mobile-shortcuts__item--active{% endif %}" href="{% url 'deck_list' %}">
+    <span aria-hidden="true">🃏</span>
+    <small>Mazos</small>
+  </a>
+  <a class="mobile-shortcuts__item {% if request.resolver_match.url_name == 'match_list' %}mobile-shortcuts__item--active{% endif %}" href="{% url 'match_list' %}">
+    <span aria-hidden="true">⚔️</span>
+    <small>Partidas</small>
+  </a>
+  <a class="mobile-shortcuts__item {% if request.resolver_match.url_name == 'invitation_list' %}mobile-shortcuts__item--active{% endif %}" href="{% url 'invitation_list' %}">
+    <span aria-hidden="true">📩</span>
+    <small>Invit.</small>
+  </a>
+  <a class="mobile-shortcuts__item {% if request.resolver_match.url_name == 'profile' %}mobile-shortcuts__item--active{% endif %}" href="{% url 'profile' %}">
+    <span aria-hidden="true">👤</span>
+    <small>Perfil</small>
+  </a>
+</nav>
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 <script src="{% static 'vendor/notyf-fallback.js' %}"></script>
