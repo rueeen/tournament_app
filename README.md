@@ -77,3 +77,11 @@ El código usa ORM y capas desacopladas, por lo que basta cambiar `DATABASES` en
 - Incluye trazabilidad de propuestas y decisiones con timestamp.
 - Incluye feedback con mensajes flash.
 - Incluye estados vacíos y loaders básicos en frontend.
+
+## Integración con Scryfall (comandantes)
+- Búsqueda principal por `/cards/search` con filtros orientados a Commander (`type:legendary type:creature game:paper`).
+- Fallback por `/cards/named` usando `exact` y luego `fuzzy` cuando la búsqueda principal no devuelve resultados.
+- Manejo de paginación (`has_more`/`next_page`) para respetar el `limit` solicitado.
+- Compatibilidad con cartas de múltiples caras (`card_faces`) para imagen y texto de reglas.
+- Manejo defensivo de errores HTTP/red/JSON con reintentos exponenciales para `429` y `5xx`.
+- Cache en memoria de corto plazo (TTL) para reducir llamadas repetidas en búsquedas frecuentes.
