@@ -43,9 +43,8 @@ class InvitationResponseForm(forms.ModelForm):
 class MatchResultProposalForm(forms.ModelForm):
     class Meta:
         model = MatchResultProposal
-        fields = ('winner', 'closed_at', 'observations')
+        fields = ('winner', 'observations')
         widgets = {
-            'closed_at': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'observations': forms.Textarea(attrs={'rows': 3}),
         }
 

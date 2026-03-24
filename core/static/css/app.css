@@ -134,3 +134,29 @@ a:hover { color: #c0dcff; }
 .notification-item--unread {
   background: rgba(94, 162, 255, 0.18);
 }
+
+
+.notifications-menu {
+  max-height: min(65vh, 520px);
+  overflow-y: auto;
+}
+
+@media (max-width: 576px) {
+  .notifications-wrapper {
+    position: static;
+  }
+
+  .notifications-menu {
+    position: fixed !important;
+    inset: 60px 0.5rem auto 0.5rem;
+    min-width: auto;
+    max-width: none;
+    width: auto;
+    max-height: calc(100vh - 74px);
+    margin-top: 0;
+  }
+
+  .notifications-trigger {
+    min-width: 2.5rem;
+  }
+}
