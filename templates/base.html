@@ -25,6 +25,7 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'invitation_list' %}">Invitaciones</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'ranking_dashboard' %}">Rankings</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'profile' %}">Perfil</a></li>
+        {% if user.is_superuser %}<li class="nav-item"><a class="nav-link text-warning" href="{% url 'superuser_panel' %}">Panel admin</a></li>{% endif %}
       </ul>
       <div class="dropdown me-3 notifications-wrapper">
         <button class="btn btn-outline-light btn-sm position-relative notifications-trigger" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" aria-label="Abrir notificaciones">
