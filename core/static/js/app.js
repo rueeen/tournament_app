@@ -1,9 +1,11 @@
 
 window.addEventListener('load', () => {
+  const isMobile = window.matchMedia('(max-width: 576px)').matches;
   const notyf = window.Notyf
     ? new Notyf({
-        duration: 3500,
-        position: { x: 'right', y: 'top' },
+        duration: isMobile ? 4500 : 3500,
+        dismissible: isMobile,
+        position: { x: isMobile ? 'center' : 'right', y: 'top' },
         types: [
           { type: 'info', background: '#5ea2ff' },
           { type: 'warning', background: '#f0ad4e' },

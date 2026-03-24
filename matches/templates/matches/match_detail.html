@@ -9,6 +9,7 @@
 <div class="card bg-black border-success p-3 mb-3">
   <h2 class="h6">Resultado final</h2>
   <p>Ganador confirmado: <strong>{{ latest_proposal.winner.username }}</strong></p>
+  <p>Fecha de cierre (hora del servidor): {{ latest_proposal.closed_at|date:"d/m/Y H:i" }}</p>
   <p class="mb-0">Este resultado ya fue aceptado por todos los jugadores.</p>
 </div>
 {% elif active_proposal %}
@@ -16,6 +17,7 @@
   <h2 class="h6">Resultado propuesto</h2>
   <p>Ganador: <strong>{{ active_proposal.winner.username }}</strong></p>
   <p>Propuesto por: {{ active_proposal.proposed_by.username }}</p>
+  <p>Fecha de cierre (hora del servidor): {{ active_proposal.closed_at|date:"d/m/Y H:i" }}</p>
   {% if my_acceptance %}
   <p class="mb-0 text-secondary">Ya registraste tu decisión: {{ my_acceptance.get_decision_display }}.</p>
   {% else %}
