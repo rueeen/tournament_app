@@ -14,22 +14,58 @@ COLOR_NAME_MAP = {
 
 
 def search_commanders(term, limit=8):
-    query = f'{term} type:legendary type:creature game:paper'
+    """Search commanders in Scryfall.
+
+    First we prioritize true EDH commanders (legendary creatures in paper).
+    If Scryfall returns no rows for that strict query, we run a fallback by name
+    and keep cards that are commander-legal (legendary creature or explicit
+    "can be your commander" text).
+    """
+    primary_query = f'{term} type:legendary type:creature game:paper'
+    cards = _fetch_cards(primary_query, limit=limit)
+
+    if not cards:
+        fallback_query = f'!"{term}" game:paper'
+        fallback_cards = _fetch_cards(fallback_query, limit=limit * 2)
+        cards = [card for card in fallback_cards if is_commander_legal(card)][:limit]
+
+    return [serialize_commander(card) for card in cards]
+
+
+def _fetch_cards(query, limit):
+    payload = _fetch_payload(query)
+    if not payload:
+        return []
+    return payload.get('data', [])[:limit]
+
+
+def _fetch_payload(query):
     url = SCRYFALL_SEARCH_URL.format(query=quote_plus(query))
     request = Request(url, headers={'User-Agent': 'tournament-app/1.0'})
 
     try:
         with urlopen(request, timeout=6) as response:
-            payload = json.loads(response.read().decode('utf-8'))
+            return json.loads(response.read().decode('utf-8'))
     except (HTTPError, URLError, TimeoutError, json.JSONDecodeError):
-        return []
+        return None
 
-    cards = payload.get('data', [])[:limit]
-    return [serialize_commander(card) for card in cards]
+
+def is_commander_legal(card):
+    typeline = (card.get('type_line') or '').lower()
+    oracle_text = (card.get('oracle_text') or '').lower()
+
+    return (
+        'legendary' in typeline and 'creature' in typeline
+    ) or 'can be your commander' in oracle_text
 
 
 def serialize_commander(card):
     image_uris = card.get('image_uris', {})
+    if not image_uris:
+        card_faces = card.get('card_faces') or []
+        if card_faces:
+            image_uris = card_faces[0].get('image_uris', {})
+
     image_url = image_uris.get('art_crop') or image_uris.get('normal', '')
     color_identity = card.get('color_identity', [])
 
